@@ -3,30 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MyCharacterController : MonoBehaviour {
-    public CharacterController charController;
-    public float movementSpeed;
-    private Transform playerTransform;
+    public float speed = 6.0F;
+    public float jumpSpeed = 8.0F;
+    public float gravity = 20.0F;
+    private Vector3 moveDirection = Vector3.zero;
+    private CharacterController controller;
 
     void Start()
     {
-        playerTransform = transform;
+        controller = GetComponent<CharacterController>();
     }
     void Update()
     {
-        Move();
-    }
+        if (controller.isGrounded)
+        {
+            moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+            moveDirection = transform.TransformDirection(moveDirection);
+            moveDirection *= speed;
+            if (Input.GetButton("Jump"))
+                moveDirection.y = jumpSpeed;
 
-    private void Move()
-    {
-        if(Input.GetAxis("Vertical") != 0)
-        {
-            charController.transform.position += playerTransform.forward * Input.GetAxisRaw("Vertical") * Time.deltaTime * movementSpeed;
         }
-        if (Input.GetAxis("Horizontal") != 0)
-        {
-            charController.transform.position += playerTransform.right * Input.GetAxisRaw("Horizontal") * Time.deltaTime * movementSpeed;
-        }
+        moveDirection.y -= gravity * Time.deltaTime;
+        controller.Move(moveDirection * Time.deltaTime);
     }
-    
 }
 
